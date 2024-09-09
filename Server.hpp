@@ -6,7 +6,7 @@
 /*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 05:22:34 by hlabouit          #+#    #+#             */
-/*   Updated: 2024/09/09 05:25:34 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/09/09 05:42:42 by frukundo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 #include "includes/Client.hpp"
 #include "includes/Channel.hpp"
 #include "includes/replies.hpp"
+#include "NR"
 
 const std::string ERR_NEEDMOREPARAMS = "461";
 const std::string ERR_ALREADYREGISTERED = "462";
