@@ -6,7 +6,7 @@
 /*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 13:52:36 by frukundo          #+#    #+#             */
-/*   Updated: 2024/08/26 16:59:56 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/09/09 06:48:10 by frukundo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 Client::Client()
 {
-	this->nickname = "";
-	this->username = "";
+	this->nickname = "default";
+	this->username = "default1";
 	this->fd = -1;
 	this->isOperator= false;
 	this->registered = false;
@@ -52,11 +52,19 @@ bool Client::GetInviteChannel(std::string &ChName){
 std::string Client::GetNickName(){return this->nickname;}
 bool Client::GetLogedIn(){return this->logedin;}
 std::string Client::GetUserName(){return this->username;}
-std::string Client::getBuffer(){return buffer;}
 std::string Client::getIpAdd(){return ipadd;}
 std::string Client::getHostname(){
-	std::string hostname = this->GetNickName() + "!" + this->GetUserName();
-	return hostname;
+    char hostname[1024];
+    memset(hostname, 0, sizeof(hostname));
+    
+    // Get the hostname of the current machine
+    if (gethostname(hostname, sizeof(hostname)) == -1)
+    {
+        std::cerr << "Failed to get hostname, using default 'localhost'" << std::endl;
+        return "localhost";  // Return "localhost" if there's an error
+    }
+    
+    return std::string(hostname);  // Convert char array to std::string
 }
 //---------------//Getters
 //---------------//Setters
@@ -64,12 +72,11 @@ void Client::SetFd(int fd){this->fd = fd;}
 void Client::SetNickname(std::string& nickName){this->nickname = nickName;}
 void Client::setLogedin(bool value){this->logedin = value;}
 void Client::SetUsername(std::string& username){this->username = username;}
-void Client::setBuffer(std::string recived){buffer += recived;}
 void Client::setRegistered(bool value){registered = value;}
 void Client::setIpAdd(std::string ipadd){this->ipadd = ipadd;}
 //---------------//Setters
 //---------------//Methods
-void Client::clearBuffer(){buffer.clear();}
+
 void Client::AddChannelInvite(std::string &chname){
 	ChannelsInvite.push_back(chname);
 }

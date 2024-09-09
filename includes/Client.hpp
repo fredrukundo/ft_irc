@@ -6,7 +6,7 @@
 /*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 12:19:54 by frukundo          #+#    #+#             */
-/*   Updated: 2024/08/26 16:52:45 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/08/29 14:46:29 by frukundo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ private:
 	bool isOperator;
 	bool registered;
 	std::string nickname;
-	bool logedin;
 	std::string username;
+	bool logedin;
 	std::string buffer;
 	std::vector<std::string> ChannelsInvite;
 public:
@@ -43,18 +43,15 @@ public:
 	bool 		GetLogedIn();
 	std::string GetUserName();
 	std::string getIpAdd();
-	std::string getBuffer();
 	std::string getHostname();
 	//---------------//Setters
 	void SetFd(int fd);
 	void SetNickname(std::string& nickName);
 	void setLogedin(bool value);
 	void SetUsername(std::string& username);
-	void setBuffer(std::string recived);
 	void setRegistered(bool value);
 	void setIpAdd(std::string ipadd);
 	//---------------//Methods
-	void clearBuffer();
 	void AddChannelInvite(std::string &chname);
 	void RmChannelInvite(std::string &chname);
 };

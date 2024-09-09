@@ -6,18 +6,17 @@
 #    By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/31 05:26:15 by hlabouit          #+#    #+#              #
-#    Updated: 2024/08/30 16:34:28 by frukundo         ###   ########.fr        #
+#    Updated: 2024/09/08 17:59:29 by frukundo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = irc_server
 
-CPPFILES = Server.cpp main.cpp Channel.cpp Client.cpp Authenti.cpp CMD/Join.cpp CMD/PRIVMSG.cpp
-
+CPPFILES = Server.cpp main.cpp Channel.cpp Client.cpp CMD/Join.cpp CMD/Privmsg.cpp CMD/Invite.cpp CMD/Topic.cpp CMD/Kick.cpp CMD/Part.cpp CMD/Quit.cpp CMD/Mode.cpp
 CPPOFILES = $(CPPFILES:%.cpp=%.o)
 
-CPPC = c++
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g 
+CPPC = c++ -g
+CPPFLAGS =  -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g 
 
 HEADERS = Server.hpp ./includes
 
@@ -40,4 +39,3 @@ fclean: clean
 re: fclean all 
 
 .PHONY: all clean fclean re
-
