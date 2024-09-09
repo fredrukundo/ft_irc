@@ -33,7 +33,6 @@
 #include "includes/Client.hpp"
 #include "includes/Channel.hpp"
 #include "includes/replies.hpp"
-#include "NR"
 
 const std::string ERR_NEEDMOREPARAMS = "461";
 const std::string ERR_ALREADYREGISTERED = "462";
