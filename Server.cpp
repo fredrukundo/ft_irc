@@ -6,7 +6,7 @@
 /*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 05:22:34 by hlabouit          #+#    #+#             */
-/*   Updated: 2024/08/30 16:40:28 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/09/09 05:26:28 by frukundo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,6 @@ Server::~Server(){}
 Server::Server(Server const &src){*this = src;}
 Server &Server::operator=(Server const &src){
 	if (this != &src){
-		/*
-		struct sockaddr_in add;
-		struct sockaddr_in cliadd;
-		struct pollfd new_cli;
-		*/
 		this->port = src.port;
 		this->server_fdsocket = src.server_fdsocket;
 		this->password = src.password;
@@ -303,7 +298,7 @@ void Server::parse_exec_cmd(std::string &cmd, int fd)
 		set_username(cmd, fd);
 	else if(notregistered(fd))
 	{
-		if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
+		if (splited_cmd.size() && (splited_cmd[0] == "JOINSSSS" || splited_cmd[0] == "joinSSSSSS"))
 			JOIN(cmd, fd);
 		else if (splited_cmd.size() && (splited_cmd[0] == "PRIVMSG" || splited_cmd[0] == "privmsg"))
 			PRIVMSG(cmd, fd);
