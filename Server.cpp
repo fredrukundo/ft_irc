@@ -298,7 +298,7 @@ void Server::parse_exec_cmd(std::string &cmd, int fd)
 		set_username(cmd, fd);
 	else if(notregistered(fd))
 	{
-		if (splited_cmd.size() && (splited_cmd[0] == "JOINSSSS" || splited_cmd[0] == "joinSSSSSS"))
+		if (splited_cmd.size() && (splited_cmd[0] == "JOIN" || splited_cmd[0] == "join"))
 			JOIN(cmd, fd);
 		else if (splited_cmd.size() && (splited_cmd[0] == "PRIVMSG" || splited_cmd[0] == "privmsg"))
 			PRIVMSG(cmd, fd);
