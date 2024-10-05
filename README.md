@@ -67,4 +67,4 @@ If you'd like to contribute or suggest improvements, feel free to submit a pull 
 This project was a collaboration between:
 
 [FREDRUKUNDO's GitHub] (https://github.com/fredrukundo)  
-[FRUIT-DU-DEMON's GitHub]
+[FRUIT-DU-DEMON's GitHub] (https://github.com/FRUIT-DU-DEMON)
