@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hlabouit <hlabouit@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 14:02:10 by frukundo          #+#    #+#             */
-/*   Updated: 2024/08/26 16:59:42 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/10/02 10:22:46 by hlabouit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ Channel &Channel::operator=(Channel const &src){
 	}
 	return *this;
 }
-//---------------//Setters
+
 void Channel::SetInvitOnly(int invit_only){this->invit_only = invit_only;}
 void Channel::SetTopic(int topic){this->topic = topic;}
 void Channel::SetTime(std::string time){this->time_creation = time;}
@@ -61,8 +61,7 @@ void Channel::set_createiontime(){
 	oss << _time;
 	this->created_at = std::string(oss.str());
 }
-//---------------//Setters
-//---------------//Getters
+
 int Channel::GetInvitOnly(){return this->invit_only;}
 int Channel::GetTopic(){return this->topic;}
 int Channel::GetKey(){return this->key;}
@@ -138,8 +137,7 @@ Client* Channel::GetClientInChannel(std::string name)
 	}
 	return NULL;
 }
-//---------------//Getters
-//---------------//Methods
+
 void Channel::add_client(Client newClient){clients.push_back(newClient);}
 void Channel::add_admin(Client newClient){admins.push_back(newClient);}
 void Channel::remove_client(int fd){
@@ -177,13 +175,13 @@ bool Channel::change_adminToClient(std::string& nick){
 	if(i < admins.size()){
 		clients.push_back(admins[i]);
 		admins.erase(i + admins.begin());
+		promoteClientToAdminIfNone();
 		return true;
 	}
 	return false;
 
 }
-//---------------//Methods
-//---------------//SendToAll
+
 void Channel::sendTo_all(std::string rpl1)
 {
 	for(size_t i = 0; i < admins.size(); i++)
@@ -206,4 +204,42 @@ void Channel::sendTo_all(std::string rpl1, int fd)
 				std::cerr << "send() faild" << std::endl;
 	}
 }
-//---------------//SendToAll
+
+
+void Channel::update_nickname(std::string old_nickname, std::string new_nickname)
+{
+
+    for (std::vector<Client>::iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (it->GetNickName() == old_nickname)
+        {
+            it->SetNickname(new_nickname);
+            return;
+        }
+    }
+
+    for (std::vector<Client>::iterator it = admins.begin(); it != admins.end(); ++it)
+    {
+        if (it->GetNickName() == old_nickname)
+        {
+            it->SetNickname(new_nickname);
+            return;
+        }
+    }
+}
+
+void Channel::promoteClientToAdminIfNone()
+{
+
+    if (admins.empty())
+    {
+        if (!clients.empty())
+        {
+            admins.push_back(clients.front());
+            clients.erase(clients.begin());
+			Client cl = clients.front();
+			std::string rpl = ":" + cl.get_client_host(cl.getIpAdd()) + " MODE " + GetName() + " +o " + cl.GetNickName() + "\r\n";
+            sendTo_all(rpl);
+        }
+    }
+}
