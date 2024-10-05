@@ -6,57 +6,55 @@
 /*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/07 04:40:33 by frukundo          #+#    #+#             */
-/*   Updated: 2024/09/08 00:41:28 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/10/03 16:10:18 by frukundo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../Server.hpp"
+#include "../includes/Server.hpp"
 
 void Server::Invite(std::string &cmd, int &fd)
 {
 	std::vector<std::string> scmd = split_cmd(cmd);
-	if(scmd.size() < 3)// ERR_NEEDMOREPARAMS (461) if there are not enough parameters
+	if (scmd.size() < 3)
 	{
-        senderror(461, GetClient(fd)->GetNickName(), fd, " :Not enough parameters\r\n");
-        return;
-    }
-	std::string channelname = scmd[2].substr(1);
-	if(scmd[2][0] != '#' || !GetChannel(channelname))// ERR_NOSUCHCHANNEL (403) if the given channel does not exist
+		senderror(461, GetClient(fd)->GetNickName(), fd, " :Not enough parameters\r\n");
+		return;
+	}
+	std::string channelname = scmd[2];
+	if (scmd[2][0] != '#' || !GetChannel(channelname))
 	{
-        senderror(403, channelname, fd, " :No such channel\r\n");
-        return;
-    }
-	if (!(GetChannel(channelname)->get_client(fd)) && !(GetChannel(channelname)->get_admin(fd)))// ERR_NOTONCHANNEL (442) if the client is not on the channel
+		senderror(403, channelname, fd, " :No such channel\r\n");
+		return;
+	}
+	if (!(GetChannel(channelname)->get_client(fd)) && !(GetChannel(channelname)->get_admin(fd)))
 	{
-        senderror(442, channelname, fd, " :You're not on that channel\r\n");
-        return;
-    }
-	if (GetChannel(channelname)->GetClientInChannel(scmd[1]))// ERR_USERONCHANNEL (443) if the given nickname is already on the channel
+		senderror(442, channelname, fd, " :You're not on that channel\r\n");
+		return;
+	}
+	if (GetChannel(channelname)->GetClientInChannel(scmd[1]))
 	{
-        senderror(443, GetClient(fd)->GetNickName(), channelname, fd, " :is already on channel\r\n");
-        return;
-    }
+		senderror(443, GetClient(fd)->GetNickName(), channelname, fd, " :is already on channel\r\n");
+		return;
+	}
 	Client *clt = GetClientNick(scmd[1]);
-	if (!clt)// ERR_NOSUCHNICK (401) if the given nickname is not found
+	if (!clt)
 	{
-        senderror(401, scmd[1], fd, " :No such nick\r\n");
-        return;
-    }
-	if (GetChannel(channelname)->GetInvitOnly() && !GetChannel(channelname)->get_admin(fd))// ERR_INVITEONLYCHAN (473) if the channel is invite-only
+		senderror(401, scmd[1], fd, " :No such nick\r\n");
+		return;
+	}
+	if (GetChannel(channelname)->GetInvitOnly() && !GetChannel(channelname)->get_admin(fd))
 	{
-        senderror(482,GetChannel(channelname)->get_client(fd)->GetNickName(),scmd[1],fd," :You're not channel operator\r\n");
-        return;
-    }
-	if (GetChannel(channelname)->GetLimit() && GetChannel(channelname)->GetClientsNumber() >= GetChannel(channelname)->GetLimit()) // ERR_CHANNELISFULL (471) if the channel is full
+		senderror(482, GetChannel(channelname)->get_client(fd)->GetNickName(), scmd[1], fd, " :You're not channel operator\r\n");
+		return;
+	}
+	if (GetChannel(channelname)->GetLimit() && GetChannel(channelname)->GetClientsNumber() >= GetChannel(channelname)->GetLimit())
 	{
-        senderror(473,GetChannel(channelname)->get_client(fd)->GetNickName(),channelname,fd," :Cannot be invited to channel \r\n");
-        return;
-    }
-	// RPL_INVITING (341) if the invite was successfully sent
+		senderror(473, GetChannel(channelname)->get_client(fd)->GetNickName(), channelname, fd, " :Cannot be invited to channel \r\n");
+		return;
+	}
 	clt->AddChannelInvite(channelname);
-	std::string rep1 = ": 341 "+ GetClient(fd)->GetNickName()+" "+ clt->GetNickName()+" "+ scmd[2]+"\r\n";
+	std::string rep1 = ": 341 " + GetClient(fd)->GetNickName() + " " + clt->GetNickName() + " " + scmd[2] + "\r\n";
 	_sendResponse(rep1, fd);
-	std::string rep2 = ":"+ clt->getHostname() + " INVITE " + clt->GetNickName() + " " + scmd[2]+"\r\n";
+	std::string rep2 = ":" + clt->get_client_host(clt->getIpAdd()) + " INVITE " + clt->GetNickName() + " " + scmd[2] + "\r\n";
 	_sendResponse(rep2, clt->GetFd());
-	
 }

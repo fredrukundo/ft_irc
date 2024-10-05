@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Quit.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hlabouit <hlabouit@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/08 04:17:11 by frukundo          #+#    #+#             */
-/*   Updated: 2024/09/08 04:41:15 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/10/03 04:55:39 by hlabouit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../Server.hpp"
-
-// notice: check his function ==> erase_client_data()
+#include "../includes/Server.hpp"
 
 void FindSubStrQT(std::string cmd, std::string tofind, std::string &str)
 {
@@ -47,7 +45,7 @@ std::string SplitQuit(std::string cmd)
     if (reason.empty())
         return std::string("Quit");
     if (reason[0] != ':')
-    { // if the message does not start with ':'
+    {
         for (size_t i = 0; i < reason.size(); i++)
         {
             if (reason[i] == ' ')
@@ -56,7 +54,6 @@ std::string SplitQuit(std::string cmd)
                 break;
             }
         }
-        reason.insert(reason.begin(), ':');
     }
     return reason;
 }
@@ -74,25 +71,23 @@ void Server::QUIT(std::string cmd, int fd)
                 channels.erase(channels.begin() + i);
             else
             {
-                std::string rpl = ":" + GetClient(fd)->GetNickName() + "!~" + GetClient(fd)->GetUserName() + "@localhost QUIT " + reason + "\r\n";
+                std::string rpl = ":" + GetClient(fd)->GetNickName() + "!~" + GetClient(fd)->GetUserName() + "@" + GetClient(fd)->getIpAdd() + " QUIT " + reason + "\r\n";
                 channels[i].sendTo_all(rpl);
             }
         }
         else if (channels[i].get_admin(fd))
         {
             channels[i].remove_admin(fd);
+            channels[i].promoteClientToAdminIfNone();
             if (channels[i].GetClientsNumber() == 0)
                 channels.erase(channels.begin() + i);
             else
             {
-                std::string rpl = ":" + GetClient(fd)->GetNickName() + "!~" + GetClient(fd)->GetUserName() + "@localhost QUIT " + reason + "\r\n";
+                std::string rpl = ":" + GetClient(fd)->GetNickName() + "!~" + GetClient(fd)->GetUserName() + "@" + GetClient(fd)->getIpAdd()+ " QUIT " + reason + "\r\n";
                 channels[i].sendTo_all(rpl);
             }
         }
     }
-    std::cout << RED << "Client <" << fd << "> Disconnected" << WHI << std::endl;
-    RmChannels(fd);
-    RemoveClient(fd);
-    //RemoveFds(fd);
+    std::cout << RED << "client of socket " << YEL <<  "<" << fd << ">" << RED << " : DISCONNECTED" << WHI<< std::endl;
     close(fd);
 }

@@ -6,11 +6,11 @@
 /*   By: frukundo <frukundo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/08 02:51:01 by frukundo          #+#    #+#             */
-/*   Updated: 2024/09/08 03:25:52 by frukundo         ###   ########.fr       */
+/*   Updated: 2024/10/03 16:11:07 by frukundo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../Server.hpp"
+#include "../includes/Server.hpp"
 
 void FindSubStrPT(std::string cmd, std::string tofind, std::string &str)
 {
@@ -61,7 +61,7 @@ int Server::SplitCmdPart(std::string cmd, std::vector<std::string> &tmp, std::st
     std::string str = tmp[0];
     std::string str1;
     tmp.clear();
-    for (size_t i = 0; i < str.size(); i++) // split the first string by ',' to get the channels names
+    for (size_t i = 0; i < str.size(); i++)
     {
         if (str[i] == ',')
         {
@@ -72,7 +72,7 @@ int Server::SplitCmdPart(std::string cmd, std::vector<std::string> &tmp, std::st
             str1 += str[i];
     }
     tmp.push_back(str1);
-    for (size_t i = 0; i < tmp.size(); i++) // erase the empty strings
+    for (size_t i = 0; i < tmp.size(); i++)
     {
         if (tmp[i].empty())
             tmp.erase(tmp.begin() + i--);
@@ -90,11 +90,9 @@ int Server::SplitCmdPart(std::string cmd, std::vector<std::string> &tmp, std::st
             }
         }
     }
-    for (size_t i = 0; i < tmp.size(); i++) // erase the '#' from the channel name and check if the channel valid
+    for (size_t i = 0; i < tmp.size(); i++)
     {
-        if (*(tmp[i].begin()) == '#')
-            tmp[i].erase(tmp[i].begin());
-        else
+        if (*(tmp[i].begin()) != '#' && *(tmp[i].begin()) != '&')
         {
             senderror(403, GetClient(fd)->GetNickName(), tmp[i], GetClient(fd)->GetFd(), " :No such channel\r\n");
             tmp.erase(tmp.begin() + i--);
@@ -107,7 +105,7 @@ void Server::PART(std::string cmd, int fd)
 {
     std::vector<std::string> tmp;
     std::string reason;
-    if (!SplitCmdPart(cmd, tmp, reason, fd)) // ERR_NEEDMOREPARAMS (461) // if the channel name is empty
+    if (!SplitCmdPart(cmd, tmp, reason, fd))
     {
         senderror(461, GetClient(fd)->GetNickName(), GetClient(fd)->GetFd(), " :Not enough parameters\r\n");
         return;
@@ -116,31 +114,34 @@ void Server::PART(std::string cmd, int fd)
     {
         bool flag = false;
         for (size_t j = 0; j < this->channels.size(); j++)
-        { // search for the channel
+        {
             if (this->channels[j].GetName() == tmp[i])
-            { // check if the channel exist
+            {
                 flag = true;
-                if (!channels[j].get_client(fd) && !channels[j].get_admin(fd)) // ERR_NOTONCHANNEL (442) // if the client is not in the channel
+                if (!channels[j].get_client(fd) && !channels[j].get_admin(fd))
                 {
-                    senderror(442, GetClient(fd)->GetNickName(), "#" + tmp[i], GetClient(fd)->GetFd(), " :You're not on that channel\r\n");
+                    senderror(442, GetClient(fd)->GetNickName(), "" + tmp[i], GetClient(fd)->GetFd(), " :You're not on that channel\r\n");
                     continue;
                 }
                 std::stringstream ss;
-                ss << ":" << GetClient(fd)->GetNickName() << "!~" << GetClient(fd)->GetUserName() << "@" << "localhost" << " PART #" << tmp[i];
+                ss << ":" << GetClient(fd)->GetNickName() << "!~" << GetClient(fd)->GetUserName() << "@" << GetClient(fd)->getIpAdd() << " PART " << tmp[i];
                 if (!reason.empty())
                     ss << " :" << reason << "\r\n";
                 else
                     ss << "\r\n";
                 channels[j].sendTo_all(ss.str());
                 if (channels[j].get_admin(channels[j].GetClientInChannel(GetClient(fd)->GetNickName())->GetFd()))
+                {
                     channels[j].remove_admin(channels[j].GetClientInChannel(GetClient(fd)->GetNickName())->GetFd());
+                    channels[j].promoteClientToAdminIfNone();
+                }
                 else
                     channels[j].remove_client(channels[j].GetClientInChannel(GetClient(fd)->GetNickName())->GetFd());
                 if (channels[j].GetClientsNumber() == 0)
                     channels.erase(channels.begin() + j);
             }
         }
-        if (!flag) // ERR_NOSUCHCHANNEL (403) // if the channel doesn't exist
-            senderror(403, GetClient(fd)->GetNickName(), "#" + tmp[i], GetClient(fd)->GetFd(), " :No such channel\r\n");
+        if (!flag)
+            senderror(403, GetClient(fd)->GetNickName(), "" + tmp[i], GetClient(fd)->GetFd(), " :No such channel\r\n");
     }
 }
